@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd gke && \
+   echo "Generando kubeconfig file" 
+   
+   pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml \
+   
+   ip=$(pulumi stack output ingress_ip) \
+   
+   echo -e "\nIngress $ip" &&\
+   
+   echo -e "\nkubectl get pod" &&\
+     KUBECONFIG=./kubeconfig.yaml kubectl get po &&\
+   
+   sleep 20 \
+   
+   echo -e "\nEndpoint greetings:" &&\
+        curl -XGET "http://$ip/greetings" \
+   
+   echo -e "\nEndpoint square:" \ 
+        curl -XPOST -d number=98746 "http://$ip/square"

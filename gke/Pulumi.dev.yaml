@@ -1,0 +1,8 @@
+config:
+  gcp:project: groovy-legacy-312114
+  gcp:zone: us-west1-a
+  gke:master_version: 1.20.8-gke.900
+  gke:node_count: 1
+  gke:node_machine_type: n1-standard-2
+  gke:password:
+    secure: AAABADg9tvzIi993TV+7Wf8GLq9OR4hVxZAsF8mbJqE=

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo -e " CREATE / PUSH IMAGE \n -----------------------------------------------------"
+
+read -p "ARCHIVO DE CREDENCIALES: " PARAM_JSON_CREDENTIAL
+PARAM_JSON_CREDENTIAL="${VARIABLE:-pulumi.json}"
+
+read -p "ID DEL PROJECTO: " PARAM_PROJECT
+PARAM_PROJECT="${VARIABLE:-groovy-legacy-312114}"
+
+echo -e " Contruyendo imagen desde archivo Dockerfile"
+
+docker build --file flaskApi/Dockerfile --no-cache flaskApi/ -t gcr.io/$PARAM_PROJECT/api > /dev/null
+
+echo -e " Habilitando APIs de container reigstry"
+
+gcloud services enable containerregistry.googleapis.com 
+
+echo -e " Obteniendo login GCP para gcloud registry"
+
+cat $PARAM_JSON_CREDENTIAL | docker login -u _json_key --password-stdin https://gcr.io 2> /dev/null 
+
+echo -e " Pusheando imagen"
+
+docker push gcr.io/$PARAM_PROJECT/api > /dev/null
+
+echo -e " Actividades realizadas correctamente\n"

@@ -1,0 +1,79 @@
+#!/bin/bash
+
+echo -e " GENERATE_APP \n -----------------------------------------------------"
+
+read -p "NOMBRE DEL APP DIRECTORIO: " PARAM_DIR
+
+PARAM_DIR="${VARIABLE:-flaskApi}"
+
+# Directorio de App
+
+mkdir ./$PARAM_DIR
+
+echo -e " Carpeta $PARAM_DIR generada correctamente\n"
+
+# Definicion de parametros
+
+PARAM_APP=./$PARAM_DIR/app.py
+
+PARAM_DOCKERFILE=./$PARAM_DIR/Dockerfile
+
+PARAM_REQ=./$PARAM_DIR/requirements.txt
+
+# Creacion de python app
+
+cat << EOF >$PARAM_APP
+from flask import Flask, request, jsonify
+import math 
+import os
+
+app = Flask(__name__)
+
+@app.route("/")
+def default():
+    return ""
+
+@app.route("/greetings")
+def greetings_function():
+    return "Hello World from "+os.environ['HOSTNAME']
+
+@app.route("/square",methods=["POST"])
+def square_function():
+    num = request.form.get('number', type=int)
+    return jsonify({'resultado': math.sqrt(num)})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True)
+EOF
+echo -e " Archivo $PARAM_APP generado correctamente\n"
+
+
+# Creacion de Dockerfile
+
+cat << EOF >$PARAM_DOCKERFILE
+FROM python:3-slim AS build
+ADD . /app
+COPY requirements.txt /
+WORKDIR /app
+RUN pip install --upgrade pip
+RUN pip install -r ./requirements.txt
+
+FROM gcr.io/distroless/python3
+COPY --from=build /app /app
+COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+WORKDIR /app
+ENV PYTHONPATH=/usr/local/lib/python3.9/site-packages
+ENV FLASK_APP=/app/app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+EXPOSE 80
+ENTRYPOINT ["python", "-m", "flask", "run", "--port", "80"]
+EOF
+echo -e " Archivo $PARAM_DOCKERFILE generado correctamente\n"
+
+
+# Creacion de requerimientos.txt
+cat << EOF >$PARAM_REQ
+Flask
+EOF
+echo -e " Archivo $PARAM_REQ generado correctamente\n"
+

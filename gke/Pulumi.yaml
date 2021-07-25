@@ -1,0 +1,6 @@
+name: gke
+description: Google Kubernetes Engine
+runtime:
+  name: python
+  options:
+    virtualenv: venv

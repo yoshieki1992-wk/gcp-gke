@@ -1,0 +1,32 @@
+#!/bin/bash
+
+read -p "GCP PROJECT ID: " PARAM_PROJECT
+PARAM_PROJECT="${VARIABLE:-groovy-legacy-312114}"
+
+read -p "GCP ZONE: " PARAM_GZONE
+PARAM_GZONE="${VARIABLE:-us-west1-a}"
+
+read -p "NODE COUNT: " PARAM_NODE
+PARAM_NODE="${VARIABLE:-1}"
+
+read -p "NODE SIZE: " PARAM_VM
+PARAM_VM="${VARIABLE:-n1-standard-2}"
+
+read -p "GKE MASTER VERSION: " PARAM_MVERSION
+PARAM_MVERSION="${VARIABLE:-1.20.8-gke.900}"
+
+#git clone
+
+cat << EOF >gke/Pulumi.dev.yaml
+config:
+  gcp:project: $PARAM_PROJECT
+  gcp:zone: $PARAM_GZONE
+  gke:master_version: $PARAM_MVERSION
+  gke:node_count: $PARAM_NODE
+  gke:node_machine_type: $PARAM_VM
+  gke:password:
+    secure: AAABADg9tvzIi993TV+7Wf8GLq9OR4hVxZAsF8mbJqE=
+EOF
+
+cd gke && \
+   pulumi up --yes
